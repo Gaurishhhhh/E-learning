@@ -19,8 +19,8 @@ class User(UserMixin, db.Model):
     # Relationships
     enrolled_courses = db.relationship('Enrollment', back_populates='student')
     created_courses = db.relationship('Course', back_populates='instructor')
-    forum_posts = db.relationship('ForumPost', back_populates='author')
     notifications = db.relationship('Notification', back_populates='user')
+    notes = db.relationship('Note', back_populates='user', cascade='all, delete-orphan')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -36,12 +36,12 @@ class Course(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     instructor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     is_published = db.Column(db.Boolean, default=False)
+    pdf_file = db.Column(db.String(255))  # Store the path to the PDF file
     
     # Relationships
     instructor = db.relationship('User', back_populates='created_courses')
     lessons = db.relationship('Lesson', back_populates='course', cascade='all, delete-orphan')
     enrollments = db.relationship('Enrollment', back_populates='course')
-    forum_topics = db.relationship('ForumTopic', back_populates='course')
 
 class Lesson(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -78,27 +78,6 @@ class LessonProgress(db.Model):
     enrollment = db.relationship('Enrollment', back_populates='progress')
     lesson = db.relationship('Lesson', back_populates='progress')
 
-class ForumTopic(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationships
-    course = db.relationship('Course', back_populates='forum_topics')
-    posts = db.relationship('ForumPost', back_populates='topic', cascade='all, delete-orphan')
-
-class ForumPost(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.Text, nullable=False)
-    topic_id = db.Column(db.Integer, db.ForeignKey('forum_topic.id'))
-    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationships
-    topic = db.relationship('ForumTopic', back_populates='posts')
-    author = db.relationship('User', back_populates='forum_posts')
-
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -108,3 +87,15 @@ class Notification(db.Model):
     
     # Relationships
     user = db.relationship('User', back_populates='notifications')
+
+class Note(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'), nullable=True)
+    
+    # Relationships
+    user = db.relationship('User', back_populates='notes')

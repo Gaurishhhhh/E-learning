@@ -37,11 +37,11 @@ def create_app():
     from app.admin import bp as admin_bp
     app.register_blueprint(admin_bp)
 
-    from app.forum import bp as forum_bp
-    app.register_blueprint(forum_bp)
-
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
+
+    from app.notes import bp as notes_bp
+    app.register_blueprint(notes_bp)
 
     # Ensure the upload directory exists
     import os
