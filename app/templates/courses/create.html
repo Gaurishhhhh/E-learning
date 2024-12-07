@@ -27,14 +27,6 @@
                         </div>
 
                         <div class="mb-3">
-                            {{ form.price.label(class="form-label") }}
-                            {{ form.price(class="form-control") }}
-                            {% for error in form.price.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-
-                        <div class="mb-3">
                             {{ form.pdf_file.label(class="form-label") }}
                             {{ form.pdf_file(class="form-control") }}
                             {% for error in form.pdf_file.errors %}
@@ -59,8 +51,8 @@
                     <ul class="list-unstyled">
                         <li>✓ Choose a clear and descriptive title</li>
                         <li>✓ Write a detailed course description</li>
-                        <li>✓ Set a fair price for your content</li>
                         <li>✓ Prepare your course material in PDF format</li>
+                        <li>✓ Make sure content is well-organized</li>
                     </ul>
                 </div>
             </div>

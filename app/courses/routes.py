@@ -9,7 +9,7 @@ import os
 from werkzeug.utils import secure_filename
 
 def save_pdf(pdf_file):
-    if not pdf_file:
+    if not pdf_file or not hasattr(pdf_file, 'filename'):
         return None
     filename = secure_filename(pdf_file.filename)
     # Create a unique filename using timestamp
@@ -86,7 +86,8 @@ def manage(course_id):
             
             # Save new PDF
             pdf_filename = save_pdf(form.pdf_file.data)
-            course.pdf_file = pdf_filename
+            if pdf_filename:
+                course.pdf_file = pdf_filename
         
         db.session.commit()
         flash('Course updated successfully!', 'success')

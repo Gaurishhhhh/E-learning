@@ -36,14 +36,6 @@
                         </div>
 
                         <div class="mb-3">
-                            {{ form.price.label(class="form-label") }}
-                            {{ form.price(class="form-control") }}
-                            {% for error in form.price.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-
-                        <div class="mb-3">
                             {{ form.pdf_file.label(class="form-label") }}
                             {{ form.pdf_file(class="form-control") }}
                             {% for error in form.pdf_file.errors %}
@@ -87,8 +79,9 @@
                 <div class="card-body">
                     <h5 class="card-title">Course Material</h5>
                     <p class="card-text">
-                        <a href="{{ url_for('courses.download_pdf', course_id=course.id) }}" class="btn btn-outline-primary btn-sm">
-                            Download Current PDF
+                        <a href="{{ url_for('static', filename='uploads/pdfs/' + course.pdf_file) }}" 
+                           class="btn btn-outline-primary btn-sm" target="_blank">
+                            View Current PDF
                         </a>
                     </p>
                 </div>
