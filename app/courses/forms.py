@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, TextAreaField, FloatField, SubmitField
-from wtforms.validators import DataRequired, Length, NumberRange
+from wtforms import StringField, TextAreaField, SubmitField
+from wtforms.validators import DataRequired, Length
 
 class CourseForm(FlaskForm):
     title = StringField('Course Title', validators=[
@@ -11,10 +11,6 @@ class CourseForm(FlaskForm):
     description = TextAreaField('Course Description', validators=[
         DataRequired(),
         Length(min=50, max=5000, message="Description must be between 50 and 5000 characters")
-    ])
-    price = FloatField('Course Price', validators=[
-        DataRequired(),
-        NumberRange(min=0, message="Price cannot be negative")
     ])
     pdf_file = FileField('Course PDF', validators=[
         FileAllowed(['pdf'], 'Only PDF files are allowed!')

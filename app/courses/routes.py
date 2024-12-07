@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request, abort, send_file
+from flask import render_template, redirect, url_for, flash, request, abort, send_file, current_app, send_from_directory
 from flask_login import current_user, login_required
 from app import db
 from app.courses import bp
@@ -14,7 +14,9 @@ def save_pdf(pdf_file):
     filename = secure_filename(pdf_file.filename)
     # Create a unique filename using timestamp
     unique_filename = f"{datetime.utcnow().strftime('%Y%m%d%H%M%S')}_{filename}"
-    pdf_path = os.path.join('app', 'static', 'uploads', 'pdfs', unique_filename)
+    
+    # Use absolute path for saving
+    pdf_path = os.path.join(current_app.root_path, 'static', 'uploads', 'pdfs', unique_filename)
     os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
     pdf_file.save(pdf_path)
     return unique_filename
@@ -51,7 +53,6 @@ def create():
         course = Course(
             title=form.title.data,
             description=form.description.data,
-            price=form.price.data,
             instructor_id=current_user.id,
             pdf_file=pdf_filename
         )
@@ -75,12 +76,11 @@ def manage(course_id):
     if form.validate_on_submit():
         course.title = form.title.data
         course.description = form.description.data
-        course.price = form.price.data
         
         if form.pdf_file.data:
             # Delete old PDF if it exists
             if course.pdf_file:
-                old_pdf_path = os.path.join('app', 'static', 'uploads', 'pdfs', course.pdf_file)
+                old_pdf_path = os.path.join(current_app.root_path, 'static', 'uploads', 'pdfs', course.pdf_file)
                 if os.path.exists(old_pdf_path):
                     os.remove(old_pdf_path)
             
@@ -114,27 +114,6 @@ def view(course_id):
                          title=course.title,
                          course=course,
                          is_enrolled=is_enrolled)
-
-@bp.route('/<int:course_id>/download_pdf')
-@login_required
-def download_pdf(course_id):
-    course = Course.query.get_or_404(course_id)
-    
-    # Check if user is enrolled or is the instructor
-    if not (current_user.id == course.instructor_id or 
-            Enrollment.query.filter_by(student_id=current_user.id, course_id=course.id).first()):
-        abort(403)
-    
-    if not course.pdf_file:
-        flash('No PDF file available for this course.', 'warning')
-        return redirect(url_for('courses.view', course_id=course.id))
-    
-    pdf_path = os.path.join('app', 'static', 'uploads', 'pdfs', course.pdf_file)
-    if not os.path.exists(pdf_path):
-        flash('PDF file not found.', 'error')
-        return redirect(url_for('courses.view', course_id=course.id))
-    
-    return send_file(pdf_path, as_attachment=True)
 
 @bp.route('/<int:course_id>/enroll')
 @login_required

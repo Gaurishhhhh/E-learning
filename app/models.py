@@ -32,7 +32,6 @@ class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
-    price = db.Column(db.Float, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     instructor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     is_published = db.Column(db.Boolean, default=False)
